@@ -8,7 +8,7 @@
             </run>
         </groups>
         <classes>
-            <class name="org.example.TestPstu"/>
+            <class name="tests.testpstu.TestPstu"/>
         </classes>
     </test>
 </suite>

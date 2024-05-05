@@ -1,76 +1,65 @@
-package org.example;
+package tests.testpstu;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import pages.homepage.HomePage;
+import tests.base.BaseTest;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.example.Constants.TimeOutVariable.IMPLICIT_WAIT;
-import static org.example.Constants.Urls.ERROR_LOGIN;
-import static org.example.Constants.Urls.HOMEPAGE;
+import static common.Config.HOMEPAGE;
+import static constants.Constants.TimeOutVariable.IMPLICIT_WAIT;
+import static constants.Constants.Urls.ERROR_LOGIN;
 
 
-public class TestPstu {
-    protected WebDriver driver;
+public class TestPstu extends BaseTest {
     private final String username = "nezhdanovad10";
     private final String password = "tiMeisup2023@";
 
-    @BeforeMethod(alwaysRun = true)
-    public void openMainPage () {
-        driver = new ChromeDriver();
-        driver.get(HOMEPAGE);
-    }
-
-    @AfterMethod(alwaysRun = true)
-    public void closeBrowser() {
-        if (driver != null) {
-            driver.quit();
-        }
-    }
     @Test(groups = "positive")
-    public void testLoginPositive(){
+    void testLoginPositive(){
         String actualResult;
-        String expectedResult = username;
+        String expectedResult = "https://do.pstu.ru/";
 
-        actualResult = HomePage.login(driver, username, password);
+        homePage.login(username, password);
+
+        actualResult = driver.getCurrentUrl();
 
         Assert.assertEquals(actualResult, expectedResult);
     }
     @Test (expectedExceptions= {HomePage.ErrorLogin.class}, groups = "negative")
-    public void testLoginNegative() throws Exception{
+    void testLoginNegative() throws Exception{
         String usernameError = "nezhdanovad10";
         String passwordError = "tiMeisup2023";
 
-        HomePage.login(driver, usernameError, passwordError);
-        HomePage.errorOfLogin(driver, ERROR_LOGIN);
+        homePage.login(usernameError, passwordError);
+        homePage.errorOfLogin(ERROR_LOGIN);
     }
     @Test (groups = "positive")
-    public void testFirstCoursePositive() throws Exception{
-        HomePage.login(driver, username, password);
+    void testFirstCoursePositive() throws Exception{
+        homePage.login(username, password);
         String expectedResult = "https://do.pstu.ru/course/view.php?id=363";
         String actualResult;
 
-        HomePage.firstCourse(driver);
+        homePage.firstCourse();
 
         actualResult = driver.getCurrentUrl();
 
         Assert.assertEquals(actualResult, expectedResult);
     }
     @Test (expectedExceptions= {HomePage.ErrorPage.class}, groups = "negative")
-    public void testFirstCourseNegative() throws Exception{
-        HomePage.firstCourse(driver);
+    void testFirstCourseNegative() throws Exception{
+        homePage.firstCourse();
     }
     @Test (groups = "positive")
-    public void testGetMainMenu(){
-        HomePage.login(driver, username, password);
-        List<WebElement> actualElements = HomePage.getMainMemu(driver);
+    void testGetMainMenu(){
+        homePage.login(username, password);
+        List<WebElement> actualElements = homePage.getMainMemu();
         List<String> actualResult = new ArrayList<>();
         List<String> expectedResult = Arrays.asList(
                 "О пользователе", "Оценки", "Календарь", "Сообщения",
@@ -85,25 +74,23 @@ public class TestPstu {
         Assert.assertEquals(actualResult, expectedResult);
     }
     @Test (groups = "positive")
-    public void testExitPositive() throws Exception{
+    void testExitPositive() throws Exception{
         String actualResult;
-        String expectedResult = HOMEPAGE;
-        HomePage.login(driver, username, password);
+        String expectedResult = "Logging out";
+        homePage.login(username, password);
 
-        HomePage.exit(driver, IMPLICIT_WAIT);
+        homePage.exit();
 
-        actualResult = driver.getCurrentUrl();
+        actualResult = driver.getTitle();
 
         Assert.assertEquals(actualResult, expectedResult);
     }
     @Test(expectedExceptions = {HomePage.ErrorExit.class}, groups = "negative")
-    public void testExitNegative() throws Exception {
-        HomePage.login(driver, username, password);
-
-        HomePage.exit(driver, 2);
+    void testExitNegative() throws Exception {
+        homePage.exit();
     }
     @Test (expectedExceptions = {HomePage.ErrorPage.class}, groups = "negative")
-    public void testPersonalAccountNegative() throws Exception{
-        HomePage.personalAccount(driver);
+    void testPersonalAccountNegative() throws Exception{
+        homePage.personalAccount();
     }
 }
